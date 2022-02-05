@@ -5,7 +5,6 @@ classdef HybridArc
 %
 % Written by Paul K. Wintz, Hybrid Systems Laboratory, UC Santa Cruz.
 % © 2021.
-% test comment
 
     properties(SetAccess = immutable)
         % A column vector containing the continuous time value for each entry in the solution.
