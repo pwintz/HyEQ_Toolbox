@@ -149,6 +149,50 @@ classdef HybridArc
             this.plotByFnc('plotPhase', varargin{:})
         end
 
+        function splitTimes(this) //takes this.t and splits into sections based on this.jump_times
+          this.times_per_jump = [];
+          start_row = 1;
+          for jump_idx = 1:length(this.jump_times) //jump index
+            column = 1;
+            for time_idx = start_row:length(this.t) //time index
+              if this.t(time_idx,1) < this.jump_times(jump_idx,1) // if time less than jump point
+                this.times_per_jump(jump_idx, column) = this.t(time_idx, 1); //add time to section of data before that jump
+                column = column + 1;
+                start_row = start_row + 1
+              else
+                break
+          //add times after last jump
+          last_col = 1;
+          last_row = length(this.jump_times) + 1;
+          while start_row <= length(this.t)
+            this.times_per_jump(last_row, last_col) = this.t(start_row, 1);
+            start_row = start_row + 1;
+            last_col = last_col + 1;
+        end
+
+        function decimate(this)
+          this.decimated_times = [];
+          this.decimated_x = [];
+          for row = 1:size(this.times_per_jump, 1)
+            r = 10 //TODO: find better reduction factor, possibly fomula
+            x = this.times_per_jump(row, :);
+            decimated_times(row, :) = decimate(x, r);
+
+          col = 1;
+          for row = 1:size(this.decimated_times, 1)
+            for col = 1:size(this.decimated_times, 2)
+              this.decimated_x(row, )
+
+        end
+
+        function interpolate(this)
+          this.splitTimes();
+          this.decimate();
+          for row = 1:size(this.decimated_times, 1)
+            xq = this.decimated_times;
+            V = interp1(, this.x)
+        end
+
     end
 
     methods(Access = private)
