@@ -142,6 +142,31 @@ classdef HybridSolutionTest < matlab.unittest.TestCase
             testCase.assertEqual(restricted_sol.x, x(5:6, :))
         end
 
+        function testInterpolation(testCase)
+            t_jump = 10;  % The jump time.
+            t_end = 30;   % The final time.
+            x_jump_before = 20; % The value of x before the jump.
+            x_jump_after = 10;  % The value of x after the jump.
+            n_ts_before = 11; % Number of timesteps before the jump.
+            n_ts_after = 21;  % Number of timesteps after the jump.
+
+            x = [linspace(0, x_jump_before, n_ts_before)'; 
+                 linspace(0, x_jump_after, n_ts_after)']; 
+            x = [x rand(n_ts_before + n_ts_after, 1)]
+            t = [linspace(0, t_jump, n_ts_before)'; 
+                 linspace(t_jump, t_end, n_ts_after)'];
+            j = [zeros(n_ts_before, 1); 
+                 ones(n_ts_after, 1)];
+
+            disp(x)
+            t_grid = [0.5; 2.5; 5; 5.2; 7.6; 8.3; 12.4; 15.5; 18.7; 20.3; 21; 22.64; 24; 25.345; 27.198; 28.0004; 29]
+            sol = HybridArc(t, j, x);
+            interpolated_sol = sol.interpolate(t_grid);
+            plot(t, x, '-b*')
+            hold on
+            plot(t_grid, interpolated_sol, 'ro')
+        end
+
     end
 
 end
