@@ -150,21 +150,19 @@ classdef HybridArc
         end
 
         function interpolated_x = interpolate(this, t_grid)
-          interpolated_x = [];
+          % Interpolate a function at each point along the solution.
+          % 't_grid' is a list of times for interpolation.
+          % Returns a display of the interpolated x-values at t_grid times.
+          interpolated_x = NaN(1, length(t_grid));
+          counter = 1;
           for jump = 0:this.jump_count % for each jump
             t_in_jump = this.t(this.j == jump); % column vector of all timesteps in jump
             x_in_jump = this.x(this.j == jump, :); % array of all x in jump
             t_grid_in_jump = t_grid((t_grid >= t_in_jump(1,1)) & (t_grid <= t_in_jump(length(t_in_jump), 1))); % column vector of all t_grid in jump
-            disp(jump)
-            disp(t_in_jump)
-            disp(x_in_jump)
-            disp(t_grid_in_jump)
             interp_x_in_jump = interp1(t_in_jump, x_in_jump, t_grid_in_jump, 'spline'); % array of interpolated x in jump
-            disp(interp_x_in_jump)
-            interpolated_x = [interpolated_x; interp_x_in_jump]; % add array to all values of interpolated x
+            interpolated_x(:,counter:counter + length(interp_x_in_jump) - 1) = interp_x_in_jump;
+            counter = counter + length(interp_x_in_jump);
           end
-
-          disp(interpolated_x);
         end
 
 
