@@ -175,16 +175,19 @@ end
 isDAE = false;
 if ~isempty(E)
     isDAE = true;
-    switch isa(E,'function_handle')
-        case true % Function E(x)
-            M = E;
-            options = odeset(options,'Mass',M,'Stats','off',...
-                'MassSingular','maybe','MStateDependence','strong',...
-                'InitialSlope',f_hdae(x0,TSPAN(1))); 
-        case false % Constant double matrix
-            M = double(E);
-            options = odeset(options,'Mass',M,'Stats','off',...
-                'MassSingular','maybe','MStateDependence','none');
+    if isa(E,'function_handle') % Function E(x)
+        M = E;
+        options.Mass = M;
+        options.Stats = 'off';
+        options.MassSingular = 'maybe';
+        options.MStateDependence = 'strong';
+        options.InitialSlope = f_hdae(x0,TSPAN(1)); % WHat is f_hdae??
+    else % Constant double matrix
+        M = double(E);
+        options.Mass = M;
+        options.Stats = 'off';
+        options.MassSingular = 'maybe';
+        options.MStateDependence = 'none';
     end
 end
 
