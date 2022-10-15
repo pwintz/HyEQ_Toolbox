@@ -167,7 +167,7 @@ classdef (Abstract) HybridSystem < handle
     
     methods
         
-        function [f_vals, g_vals, C_vals, D_vals] = generateFGCD(this, sol)  
+        function [f_vals, g_vals, C_vals, D_vals] = generateFGCD(this, hybrid_arc)  
             % Compute the values of the data (f, g, C, D) at each point along a given hybrid solution.
             % 
             % The flow map 'f' and jump map 'g' are evaluated at each point (including
@@ -180,11 +180,11 @@ classdef (Abstract) HybridSystem < handle
             % HybridSystem.flowMap, HybridSystem.jumpMap,
             % HybridSystem.flowSetIndicator,
             % HybridSystem.jumpSetIndicator.
-            assert(isa(sol, 'HybridSolution'))
+            assert(isa(hybrid_arc, 'HybridArc'), 'Given input was not a HybridArc.')
 
-            t = sol.t;
-            j = sol.j;
-            x = sol.x;
+            t = hybrid_arc.t;
+            j = hybrid_arc.j;
+            x = hybrid_arc.x;
             
             if ~isempty(this.state_dimension)
                 assert(this.state_dimension == size(x, 2), ...
