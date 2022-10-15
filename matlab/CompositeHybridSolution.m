@@ -29,6 +29,39 @@ classdef CompositeHybridSolution < HybridSolution
             this.subsys_count = length(subsystem_solutions);
             this.subsystems = subsystems;
         end
+
+
+
+        function restricted_sol = restrictT(this, tspan)
+            % Restrict the domain in ordinary time to the interval 'tspan'.
+            % 'tspan' must be a 2x1 array of real numbers. 
+            % 
+            % See also: HybridArc/restrictJ
+            assert(isnumeric(tspan), 'tspan must be numeric')
+            assert(all(size(tspan) == [1 2]), 'tspan must be a 1x2 array.')
+            ndxs_in_span = this.t >= tspan(1) & this.t <= tspan(2);
+
+            restricted_sol = HybridArc(this.t(ndxs_in_span), ...
+                                            this.j(ndxs_in_span), ...
+                                            this.x(ndxs_in_span, :));
+        end
+
+        function restricted_sol = restrictJ(this, jspan)
+            % Restrict the domain in discrete time to the interval 'jspan'.
+            % 'jspan' must be either a 2x1 array of integers or a single integer. 
+            % 
+            % See also: HybridArc/restrictT
+            assert(isnumeric(jspan), 'jspan must be numeric')
+            if isscalar(jspan)
+                jspan = [jspan jspan];
+            end
+            assert(all(size(jspan) == [1 2]), 'jspan must be a 1x2 array.')
+            ndxs_in_span = this.j >= jspan(1) & this.j <= jspan(2);
+
+            restricted_sol = HybridArc(this.t(ndxs_in_span), ...
+                                        this.j(ndxs_in_span), ...
+                                        this.x(ndxs_in_span, :));
+        end
     end
 
     methods(Hidden)
