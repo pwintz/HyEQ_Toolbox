@@ -12,7 +12,7 @@ jobs:
       - name: Run script
         uses: matlab-actions/run-command@v1
         with:
-          command: addpath("matlab", "Examples"); hybrid.tests.run
+          command: addpath("matlab", "simulink", "Examples"); hybrid.tests.run
         
 #       - name: Run tests and generate artifacts
 #         uses: matlab-actions/run-tests@v1
