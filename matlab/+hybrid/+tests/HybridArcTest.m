@@ -500,6 +500,57 @@ classdef HybridArcTest < matlab.unittest.TestCase
             testCase.assertEqual(interp_harc.x, ones(n_interp, 1))
         end
 
+        function testInterpolateToHybridArc_ConstantX_NoJumps2D(testCase)
+            x = [ones(10, 1), 2*ones(10, 1)];
+            t = linspace(0, 9, 10)';
+            j = zeros(10, 1);
+            sol = HybridArc(t, j, x);
+
+            n_interp = 100;
+            t_grid = linspace(0, 9, n_interp)'; % Test using column vector.
+            interp_sol = sol.interpolateToHybridArc(t_grid);
+            
+            % Check values
+            expected_array = [ones(n_interp, 1), 2*ones(n_interp, 1)];
+            testCase.assertEqual(interp_sol.x, expected_array)
+            testCase.assertEqual(interp_sol.t, t_grid)
+            testCase.assertEqual(interp_sol.j, zeros(n_interp, 1))
+        end
+
+        function testInterpolateToHybridArc_ConstantX_OneJump(testCase)
+            JUMP_T = 4;
+            t = [linspace(0, JUMP_T), linspace(JUMP_T, 8)]';
+            % t = [0; 1; 2; 3; JUMP_T; JUMP_T; 5; 6; 7; 8]; % jump at t=4
+            j = [zeros(100, 1); ones(100, 1)];
+            % j = [0; 0; 0; 0; 0; 1; 1; 1; 1; 1];
+            x = ones(numel(t), 1);
+            sol = HybridArc(t,j,x);
+
+            t_grid = [0 5 6];
+            interpolated_sol = sol.interpolateToHybridArc(t_grid);
+
+            % Check values
+            n_interp_time_steps = numel(t_grid) + 2*interpolated_sol.jump_count;
+            testCase.assertEqual(interpolated_sol.t, [0; JUMP_T; JUMP_T; 5; 8] )
+            testCase.assertEqual(interpolated_sol.x, ones(n_interp_time_steps, 1))
+        end
+
+        function testInterpolateToHybridArc_interpGridRangeNeqTSPAN(testCase)
+            % Test the case where min(t_grid) > t(1) or max(t_grid) < t(end)   
+            
+            t = [linspace(0, 30)]';
+            j = [zeros(100, 1)];
+            x = ones(numel(t), 1);
+            sol = HybridArc(t,j,x);
+
+            t_grid = [t(1) + 1; t(end) - 1];
+            interpolated_sol = sol.interpolateToHybridArc(t_grid);
+
+            % Check values
+            testCase.assertEqual(interpolated_sol.t, t_grid)
+            testCase.assertEqual(interpolated_sol.x, [1; 1])
+        end
+
         %%% Test restrictT and restrictJ %%%
 
         function testRestrictT(testCase)

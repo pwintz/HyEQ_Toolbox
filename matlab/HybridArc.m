@@ -371,7 +371,8 @@ classdef HybridArc
             % interpolateToHybridArc is well-formed. If it is, then transform it
             % into a standard form, namely a column vector. 
             t_interp = this.preprocess_t_interp(t_interp);
-            
+            t_interp_range = [min(t_interp) max(t_interp)];
+
             if ~exist('interp_method', 'var')
                 interp_method = 'spline';
             end
@@ -435,6 +436,10 @@ classdef HybridArc
             j_interp = [j_iofs_cell{:}]'; % Transpose so time-steps are in rows.
             x_interp = [x_iofs_cell{:}]'; % Transpose so time-steps are in rows.
             hybrid_arc = HybridArc(t_interp, j_interp, x_interp);
+
+            % Restrict the interpolated arc to the range of t-values in the
+            % given interpolation grid.
+            hybrid_arc = hybrid_arc.restrictT(t_interp_range);
         end
     end
 
