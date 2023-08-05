@@ -944,7 +944,8 @@ classdef HybridArcTest < matlab.unittest.TestCase
         end
 
         % function test_tToJIncrementing_moreAtJumpThanNumberOfJumps(testCase)
-        %     % This tests a corner case that we shouldn't expect to be important.
+        %     % This tests a corner case for a private function that we don't 
+        %     % expect to be important.
         % 
         %     t = [0; 1.5; 1.5; 1.5; 2];
         %     j = [0;   0;   1;   2; 2];
@@ -952,14 +953,13 @@ classdef HybridArcTest < matlab.unittest.TestCase
         %     harc = HybridArc(t, j, x);
         % 
         %     t_in = [1.5; 1.5; 1.5; 1.5; 1.5];
-        %     % Perhaps we should throw an error, here.
+        %     % Perhaps tToJIncrementingJForRepeatedTValuesAtJumps should throw
+        %     % an error for this case.
         %     j_out = harc.tToJIncrementingJForRepeatedTValuesAtJumps(t_in);
         % 
         %     j_out_expected = [0; 1; 2; 2; 2];
         %     testCase.assertEqual(j_out, j_out_expected)
         % end
     end
-
-
 
 end

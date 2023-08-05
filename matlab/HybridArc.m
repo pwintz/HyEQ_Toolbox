@@ -240,7 +240,6 @@ classdef HybridArc
             this.plotByFnc('plotTimeDomain', varargin{:})
         end
 
-
         function [x_interp, t_interp] = interpolateToArray(this, t_interp, varargin)
             % Interpolate a function at each point along the solution.
             % 
@@ -276,41 +275,20 @@ classdef HybridArc
             ip.FunctionName = 'HybridArc.interpolateToArray';
             addOptional(ip, 'InterpMethod', 'spline');
             
-
             % 'X_and_gX' is a matrix containing---in each column---the value immediately
             % before the jump, and the values immediately after (one or more)
             % jumps. The output must be a colu
             ValueAtJumpFnc_DEFAULT = @(X_and_gX) mean(X_and_gX, 2);
             addOptional(ip, 'ValueAtJumpFnc', ValueAtJumpFnc_DEFAULT);
 
-            % addOptional(ip, 'IncludeJumpTimes', false);
-
             parse(ip, varargin{:});
             interp_method = ip.Results.InterpMethod;
             value_at_jump_fnc = ip.Results.ValueAtJumpFnc;
             
-            % is_include_jump_times = ip.Results.IncludeJumpTimes;
-
             % Check that the input t_interp for interpolateToArray and
             % interpolateToHybridArc is well-formed. If it is, then transform it
             % into a standard form, namely a column vector. 
             t_interp = this.preprocess_t_interp(t_interp);
-
-            % if is_include_jump_times 
-            %     is_ValueAtJumpFnc_default = isequal(ip.Results.ValueAtJumpFnc, ValueAtJumpFnc_DEFAULT);
-            %     if ~is_ValueAtJumpFnc_default 
-            %         error('Incompatible options. Cannot use "ValueAtJumpFnc" and "IncludeJumpTimes" at the same time.')
-            %     end
-            % 
-            %     % Add jump times to t_interp that were not already there.
-            %     t_interp = this.insert_missing_jump_times(t_interp);
-            % 
-            %     % Set value_at_jump_fnc to preserve all of the values, so that
-            %     % the resulting output array has the values before and after the
-            %     % jump.
-            %     value_at_jump_fnc = @(x_and_g_of_xs) x_and_g_of_xs;
-            % end
-
 
             % Cell array that contains in each entry, a row array of the t-entries during
             % the corresponding interval of flow.
@@ -321,7 +299,7 @@ classdef HybridArc
             % 'x' at the correpsonding time step.
             x_iofs_cell = {};
             
-            % % To improve efficiency, preallocate cells.
+            % % To improve efficiency, we should preallocate cells.
             % t_iofs_cell = cell(1, hybrid_arc.jump_count);
             % x_iofs_cell = cell(1, hybrid_arc.jump_count);
             for j_iof = unique(this.j)'
@@ -357,13 +335,13 @@ classdef HybridArc
                 if is_first_t_immediately_after_a_jump
                     t_grid_in_iof = t_grid_in_iof(2:end);
                     x_interp_iof = x_interp_iof(2:end, :);% 'x' in rows (each row is a time-step).
-                end
 
-                % If there are multiple jumps that coincide with an
-                % interpolation point, then t_grid_in_iof will be empty, here,
-                % causing subsequent code to fail.
-                if isempty(t_grid_in_iof)
-                    continue
+                    % If there are multiple jumps that coincide with an
+                    % interpolation point, then t_grid_in_iof will be empty,
+                    % here, which will cause subsequent code to fail.
+                    if isempty(t_grid_in_iof)
+                        continue
+                    end
                 end
 
                 % Check if the end of this interval of flow (iof) is immediately
@@ -406,13 +384,10 @@ classdef HybridArc
                             x_dim, mat2str(size(values_at_jump')))
                     end
                     n_values_at_jump = size(values_at_jump, 1);
-                    x_interp_iof = [x_interp_iof; values_at_jump]; % x in rows
-                    t_grid_in_iof = [t_grid_in_iof; t_iof(end)*ones(n_values_at_jump, 1)];
-                
+                    x_interp_iof = [x_interp_iof; values_at_jump]; %#ok<AGROW>    % Each x stored in rows
+                    t_grid_in_iof = [t_grid_in_iof; t_iof(end)*ones(n_values_at_jump, 1)]; %#ok<AGROW>
                 end
 
-                
-                
                 t_iofs_cell{end+1} = t_grid_in_iof'; %#ok<AGROW> % Time-steps in columns
                 x_iofs_cell{end+1} = x_interp_iof'; %#ok<AGROW> % 'x' in columns (so that we can use cell-expansion).
             end
@@ -420,16 +395,6 @@ classdef HybridArc
             x_interp = [x_iofs_cell{:}]'; % Transpose so time-steps are in rows.
             
         end
-
-
-        % function hybrid_arc = interpolateToHybridArc2(this, t_interp, varargin)
-        %     [x_interp, t_interp] = interpolateToArray(this, t_interp, ...
-        %         "ValueAtJumpFnc", @(x_and_g_of_xs) x_and_g_of_xs);
-        % 
-        %     j_interp = this.tToJ(t_interp);
-        % 
-        %     hybrid_arc = HybridArc(t_interp, j_interp, x_interp);
-        % end
 
         function hybrid_arc = interpolateToHybridArc(this, t_interp, varargin)
             % Generate a new HybridArc object with time steps at the interpolation points given in t_interp.
@@ -481,74 +446,6 @@ classdef HybridArc
             hybrid_arc = HybridArc(t_interp, j_interp, x_interp);
         end
 
-            
-        % function hybrid_arc = interpolateToHybridArc(this, t_interp, varargin)
-        %     
-        % 
-        %     % Cell array that contains in each entry, a row array of the t-entries during
-        %     % the corresponding interval of flow.
-        %     t_iofs_cell = {};
-        % 
-        %     j_iofs_cell = {};
-        % 
-        %     % Cell array that contains in each entry, an array of the x-entries during
-        %     % the corresponding interval of flow, which each column containing the vector
-        %     % 'x' at the correpsonding time step.
-        %     x_iofs_cell = {};
-        % 
-        %     figure(1); clf
-        %     % t_iofs_cell = cell(1, hybrid_arc.jump_count);
-        %     % x_iofs_cell = cell(1, hybrid_arc.jump_count);
-        %     for j_iof = unique(this.j)'
-        %         % Indices that are in the jth interval of flow.
-        %         iof_indices = this.j == j_iof;
-        %         % is_iof = numel(iof_indices) > 1;
-        % 
-        %         t_iof = this.t(iof_indices);
-        %         x_iof = this.x(iof_indices, :);
-        % 
-        %         t_grid_in_iof = t_interp(t_interp >= t_iof(1) & t_interp <= t_iof(end));
-        % 
-        %         % If the start time of the interval of flow is not in
-        %         % t_grid_in_iof, then we add it.
-        %         if isempty(t_grid_in_iof) || t_iof(1) < t_grid_in_iof(1)
-        %             t_grid_in_iof = [t_iof(1); t_grid_in_iof];
-        %         end
-        % 
-        %         % If the end time of the interval of flow is not in
-        %         % t_grid_in_iof, then we add it.
-        %         if isempty(t_grid_in_iof) || t_iof(end) > t_grid_in_iof(end)
-        %             t_grid_in_iof = [t_grid_in_iof; t_iof(end)];
-        %         end
-        % 
-        %         if numel(t_iof) == 1
-        %             % If there is only one element in t_iof, then we cannot
-        %             % interpolate, so we just use the (single vector) value in
-        %             % x_iof.
-        %             x_interp_iof = x_iof;
-        %         else
-        %             x_interp_iof = interp1(t_iof, x_iof, t_grid_in_iof, interp_method);
-        %         end
-        % 
-        %         % Sanity check:
-        %         assert(size(x_interp_iof, 1) == numel(t_grid_in_iof), ...
-        %             'The number of rows in x should match the number elements in t.')
-        % 
-        %         t_iofs_cell{end+1} = t_grid_in_iof'; %#ok<AGROW>
-        %         j_iofs_cell{end+1} = j_iof*ones(size(t_grid_in_iof))'; %#ok<AGROW>
-        %         x_iofs_cell{end+1} = x_interp_iof'; %#ok<AGROW> % Store time-step as a column.
-        % 
-        %     end
-        % 
-        %     t_interp = [t_iofs_cell{:}]'; % Transpose so time-steps are in rows.
-        %     j_interp = [j_iofs_cell{:}]'; % Transpose so time-steps are in rows.
-        %     x_interp = [x_iofs_cell{:}]'; % Transpose so time-steps are in rows.
-        %     hybrid_arc = HybridArc(t_interp, j_interp, x_interp);
-        % 
-        %     % Restrict the interpolated arc to the range of t-values in the
-        %     % given interpolation grid.
-        %     hybrid_arc = hybrid_arc.restrictT(t_interp_range);
-        % end
     end
 
     methods(Access = {?HybridArc, ?matlab.unittest.TestCase})
@@ -612,27 +509,6 @@ classdef HybridArc
             end
         end
 
-        % function t_out = insert_missing_jump_times(this, t_in)
-        %     % Input: A sorted array of times within the tspan of this arc.
-        %     % Output: The same array, except that every jump time of this
-        %     % arc has been inserted into the array if it was not already
-        %     % there.
-        % 
-        %     % In order to insert missing jump times, we append them to an
-        %     % array and then sort it. Thus, if the user gives an array that
-        %     % is not sorted, then we will be changing the order.
-        %     assert(issorted(t_in))
-        % 
-        %     missing_jump_times = this.jump_times(~ismember(this.jump_times, t_in));
-        % 
-        %     % Remove duplicates (the value of 't' is repeated at jumps).
-        %     missing_jump_times = unique(missing_jump_times);
-        % 
-        %     % Add jump times and sort the resulting array.
-        %     t_out = sort([missing_jump_times; t_in]);
-        % end
-
-
         function t_out = ensure_before_and_after_jump_times_are_in_array(this, t_in)
             % Input: A sorted array of times within the tspan of this arc.
             % Output: The same array, except that every jump time t_jump of this
@@ -655,10 +531,16 @@ classdef HybridArc
             t_out = sort([t_in_without_jump_times; t_before_and_after_jump]);
         end
 
-
         function j = tToJ(this, t)
+            % Map a given value of time to the  Work in progress. 
             % t_excluding_after_jumps = this.t
             [unique_t, unique_t_ndxs, ~] = unique(this.t);
+
+            % if t < this.t(1) or t > this.t(end
+            %   j = []
+            %   return
+            % end
+            
             j = interp1(unique_t, this.j(unique_t_ndxs), t, 'previous');
         end
 
