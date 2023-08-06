@@ -676,15 +676,11 @@ classdef HybridArcTest < matlab.unittest.TestCase
             sol = HybridArc(t, j, x);
 
             t_grid = [0; T_JUMP; T_END];
-            [x_interp, t_interp] = sol.interpolateToHybridArc(t_grid);
-
-            % Check sizes
-            testCase.assertSize(x_interp, [3 1])
-            testCase.assertSize(t_interp, [3 1])
+            interpolated_sol = sol.interpolateToHybridArc(t_grid);
 
             % Check values
-            x_interp_expected = [X_BEFORE; mean([X_BEFORE, X_AFTER]); X_AFTER];
-            testCase.assertEqual(x_interp, x_interp_expected)
+            x_interp_expected = [X_BEFORE; X_BEFORE; X_AFTER; X_AFTER];
+            testCase.assertEqual(interpolated_sol.x, x_interp_expected)
         end
 
         function testInterpolateToHybridArc_JumpAtInterpolationPoint_2D(testCase)
@@ -706,14 +702,11 @@ classdef HybridArcTest < matlab.unittest.TestCase
             sol = HybridArc(t, j, x);
 
             t_grid = [0; T_JUMP; T_END];
-            [x_interp, t_interp] = sol.interpolateToHybridArc(t_grid);
-
-            testCase.assertSize(x_interp, [3 2])
-            testCase.assertSize(t_interp, [3 1])
+            interpolated_sol = sol.interpolateToHybridArc(t_grid);
 
             % Check values
-            x_interp_expected = [X_BEFORE; mean([X_BEFORE; X_AFTER]); X_AFTER];
-            testCase.assertEqual(x_interp, x_interp_expected)
+            x_interp_expected = [X_BEFORE; X_BEFORE; X_AFTER; X_AFTER];
+            testCase.assertEqual(interpolated_sol.x, x_interp_expected)
         end
 
         function testInterpolateToHybridArc_ScalarTGrid(testCase)
@@ -737,11 +730,11 @@ classdef HybridArcTest < matlab.unittest.TestCase
             sol = HybridArc(t, j, x);
 
             n_t_interp = 123; % Number of interpolation points.
-            [x_interp, t_interp] = sol.interpolateToHybridArc(n_t_interp);
+            interpolated_sol = sol.interpolateToHybridArc(n_t_interp);
 
             % Check the shapes are correct.
-            testCase.assertSize(x_interp, [n_t_interp x_DIM])
-            testCase.assertSize(t_interp, [n_t_interp 1])
+            n_interp_expected = n_t_interp+2; % Two points added for jump.
+            testCase.assertSize(interpolated_sol.x, [n_interp_expected x_DIM])
         end
 
         function testInterpolateToHybridArc_InterpMethod_Previous(testCase)
@@ -754,14 +747,28 @@ classdef HybridArcTest < matlab.unittest.TestCase
             sol = HybridArc(t, j, x);
 
             t_grid = [0; 0.5; 1; 1.5; 2];
-            [x_interp, t_interp] = sol.interpolateToHybridArc(t_grid, 'InterpMethod', 'previous');
-
-            testCase.assertSize(x_interp, [numel(t_grid) 2])
-            testCase.assertSize(t_interp, [numel(t_grid) 1])
+            interpolated_sol = sol.interpolateToHybridArc(t_grid, 'InterpMethod', 'previous');
 
             % Check values
             x_interp_expected = [x1; x1; x2; x2; x3];
-            testCase.assertEqual(x_interp, x_interp_expected)
+            testCase.assertEqual(interpolated_sol.x, x_interp_expected)
+        end
+
+        function testInterpolateToHybridArc_InterpMethod_Next_withJump(testCase)
+            % x-values
+            x1=[1 -1]; x2=[-2 2]; x3=[3, -3]; x4=[-4, 4];
+
+            t = [ 0;  1;  1;  2];
+            j = [ 0;  0;  1;  1];
+            x = [x1; x2; x3; x4];
+            sol = HybridArc(t, j, x);
+
+            t_grid = [0; 0.5; 1; 1.5; 2];
+            interpolated_sol = sol.interpolateToHybridArc(t_grid, 'InterpMethod', 'next');
+
+            % Check values
+            x_interp_expected = [x1; x2; x2; x3; x4; x4];
+            testCase.assertEqual(interpolated_sol.x, x_interp_expected)
         end
 
         function testInterpolateToHybridArc_ErrorIfInterpolationGridNotSorted(testCase)
@@ -779,16 +786,10 @@ classdef HybridArcTest < matlab.unittest.TestCase
 
             % Compute interpolation
             t_interp = linspace(T_END, 0, N_STEPS); % Reversed time
-            x_interp = sol.interpolateToHybridArc(t_interp);
-
-            % Check result
-            x_reversed = x(end:-1:1);
-            testCase.assertEqual(round(x_interp, 9), round(x_reversed, 9))
-            testCase.assertEqual(round(x_interp(1), 8), round(x(end), 8))
-            testCase.assertEqual(round(x_interp(end), 8), round(x(1), 8))
+            testCase.assertError(@() sol.interpolateToHybridArc(t_interp), 'HybridArc:ArgumentNotSorted');
         end
 
-        function testInterpolateToHybridArc_ErrorIfInterpolationPointOutsideOfTSpan(testCase)
+        function testInterpolateToHybridArc_ErrorIfInterpPointOutsideOfTSpan(testCase)
             % Time steps
             N_STEPS = 26; 
 
@@ -902,6 +903,18 @@ classdef HybridArcTest < matlab.unittest.TestCase
 
             j_out_expected = [0; 1];
             testCase.assertEqual(j_out, j_out_expected)
+        end
+
+        function test_tToJIncrementing_betweenTSteps_withNextAtJumpTime(testCase)            
+            t = [ 0;  1;  1;  2];
+            j = [ 0;  0;  1;  1];
+            x = rand(length(t), 2);
+            harc = HybridArc(t, j, x);
+
+            t_in = [0.5; 1; 1];
+            j_out = harc.tToJIncrementingJForRepeatedTValuesAtJumps(t_in);
+
+            testCase.assertEqual(j_out, [0; 0; 1])
         end
 
         function test_tToJIncrementing_multipleAtJump(testCase)

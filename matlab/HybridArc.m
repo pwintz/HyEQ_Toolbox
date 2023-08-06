@@ -423,7 +423,7 @@ classdef HybridArc
             % Check that the input t_interp for interpolateToArray and
             % interpolateToHybridArc is well-formed. If it is, then transform it
             % into a standard form, namely a column vector. 
-            t_interp = this.preprocess_t_interp(t_interp);
+            t_interp = this.preprocess_t_interp(t_interp, true);
 
             % Add jump times to t_interp that were not already there.
             t_interp = this.ensure_before_and_after_jump_times_are_in_array(t_interp);
@@ -467,10 +467,14 @@ classdef HybridArc
             end
         end
 
-        function t_interp = preprocess_t_interp(this, t_interp)
+        function t_interp = preprocess_t_interp(this, t_interp, ensure_sorted)
             % Check that the input t_interp for interpolateToArray and
             % interpolateToHybridArc is well-formed. If it is, then transform it
             % into a standard form, namely a column vector. 
+
+            if ~exist('ensure_sorted', 'var')
+                ensure_sorted = false;
+            end
 
             if ~isnumeric(t_interp)
                 error('t_interp must be numeric. Instead, its type was "%s".', class(t_interp))
@@ -494,6 +498,11 @@ classdef HybridArc
             elseif isrow(t_interp)
                 % Make sure t_interp is a column vector.
                 t_interp = t_interp';
+            end
+
+            if ensure_sorted && ~issorted(t_interp)
+                error('HybridArc:ArgumentNotSorted', ...
+                    'The argument ''t_interp'' is not sorted in increasing order.')
             end
 
             assert(iscolumn(t_interp), 't_interp needs to be a column after preprocessing.')
@@ -547,29 +556,32 @@ classdef HybridArc
 
             j_out = nan(numel(t_in), 1);
 
-            % We always increment t_ndx by 1, so we initially set it to zero to
-            % allow for the initial increment.
-            t_ndx = 0;
+            t_ndx = 1;
 
             % For each entry in the given array 't_in', index with 'in_and_out_ndx', 
             % we find the index 't_ndx' that 
             for in_and_out_ndx = 1:numel(t_in)
 
-                % Always increment t_ndx by at least one so that if we hit
-                % multiple jumps in a row, t_ndx increases causing j_out to
-                % increase.
-                do_once = t_ndx==0 || this.is_jump_start(t_ndx);
-
                 % Increase t_ndx until this.t(t_ndx) >= t_in(in_and_out_ndx)
-                while do_once || this.t(t_ndx) < t_in(in_and_out_ndx)
+                while this.t(t_ndx) < t_in(in_and_out_ndx)
                     t_ndx = t_ndx + 1;
-                    do_once = false;
                 end
 
-                % Check that
                 assert(this.t(t_ndx) >= t_in(in_and_out_ndx))
 
                 j_out(in_and_out_ndx) = this.j(t_ndx);
+
+                % If t_in(in_and_out_ndx) is the start of a jump, then we
+                % increment t_ndx so that j_out increases. This is important if
+                % there are multiple jumps in a row.
+                if this.t(t_ndx) == t_in(in_and_out_ndx) && this.is_jump_start(t_ndx)
+                    t_ndx = t_ndx + 1;
+                    if numel(this.t) >= t_ndx
+                        assert(this.t(t_ndx-1) == this.t(t_ndx), ...
+                            ['Incrementing t_ndx here caused this.t(t_ndx) to ' ...
+                            'change but it should have the same value.'])
+                    end
+                end
             end
         end
 
