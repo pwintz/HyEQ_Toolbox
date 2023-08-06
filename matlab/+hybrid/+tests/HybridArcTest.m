@@ -601,7 +601,6 @@ classdef HybridArcTest < matlab.unittest.TestCase
             testCase.assertEqual(interpolated_sol.x, [x1; x1; x2; x3; x3; x3])
         end
 
-
         function testInterpolateToHybridArc_ExtraInterpPointsAtJumpDiscarded(testCase)
             T_JUMP = 4;
             T_END = 8;
@@ -621,6 +620,25 @@ classdef HybridArcTest < matlab.unittest.TestCase
             testCase.assertEqual(interpolated_sol.t, [0; T_JUMP; T_JUMP; T_JUMP; 6] )
             testCase.assertEqual(interpolated_sol.j, [0; 0; 1; 2; 2] )
             testCase.assertEqual(interpolated_sol.x, [x1; x1; x2; x3; x3])
+        end
+
+        function test_interpolateToHybridArc_jumpsOutsideInterpGridIgnored(testCase)
+            sys = hybrid.examples.BouncingBall();
+            
+            % Initial condition
+            x0 = [10, 0];
+
+            % Time spans
+            tspan = [0, 20];
+            jspan = [0, 30];
+
+            % Compute solution
+            sol = sys.solve(x0, tspan, jspan);
+            t_interp = [3, 6];
+            interp_sol = sol.interpolateToHybridArc(t_interp, "InterpMethod", "linear");
+            
+            testCase.assertGreaterThanOrEqual(interp_sol.jump_times(1), t_interp(1))
+            testCase.assertLessThanOrEqual(interp_sol.jump_times(end), t_interp(end))
         end
 
         function testInterpolateToHybridArc_JNotStartingAt0(testCase)

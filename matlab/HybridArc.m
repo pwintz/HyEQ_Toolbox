@@ -400,14 +400,11 @@ classdef HybridArc
             % Generate a new HybridArc object with time steps at the interpolation points given in t_interp.
             % t_interp must be a nondecreaing vector of values that within the
             % interval [this.t(1), this.t(end)].
-            % There is an optional
+            % There is an optional name-value argument: 
+            % * "InterpMethod" with possible values...
 
             % TODO: Add documentation
             % DONE: Add autocomplete signiture.
-            % Tests to write:
-            %   * Interpolation works when interpolation grid aligns with jump
-            %   times (e.g., a interpolation time is at the start or end of an IOF).
-            %   * Works even if there are two sequential jumps.
             ip = inputParser;
             ip.FunctionName = 'HybridArc.interpolateToHybridArc';
             addOptional(ip, 'InterpMethod', 'spline');
@@ -541,6 +538,10 @@ classdef HybridArc
             t_in_without_jump_times = t_in(~ismember(t_in, this.jump_times));
 
             t_before_and_after_jump = this.t(this.is_jump_start | this.is_jump_end);
+
+            % Remove any jump times that are not in the range of 't_in'.
+            is_in_range = t_before_and_after_jump >= t_in(1) & t_before_and_after_jump <= t_in(end);
+            t_before_and_after_jump = t_before_and_after_jump(is_in_range);
 
             % Add jump times and sort the resulting array.
             t_out = sort([t_in_without_jump_times; t_before_and_after_jump]);
