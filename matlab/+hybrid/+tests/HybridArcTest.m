@@ -580,6 +580,49 @@ classdef HybridArcTest < matlab.unittest.TestCase
             testCase.assertEqual(interpolated_sol.x, ones(n_interp_time_steps, 1))
         end
 
+        function testInterpolateToHybridArc_ConstantX_MultipleSequentialJumps(testCase)
+            T_JUMP = 4;
+            T_END = 8;
+            n_per_flow = 7;
+            x1 = [1 10]; x2 = [2 20]; x3 = [3 30];
+            t = [linspace(0, T_JUMP, n_per_flow)';
+                 T_JUMP';
+                 linspace(T_JUMP, T_END, n_per_flow)'];
+            j = [zeros(n_per_flow, 1); 1; 2* ones(n_per_flow, 1)];
+            x = [ones(n_per_flow, 1)*x1; x2; ones(n_per_flow, 1)*x3]; 
+            sol = HybridArc(t,j,x);
+
+            t_grid = [0 5 6];
+            interpolated_sol = sol.interpolateToHybridArc(t_grid);
+
+            % Check values
+            testCase.assertEqual(interpolated_sol.t, [0; T_JUMP; T_JUMP; T_JUMP; 5; 6] )
+            testCase.assertEqual(interpolated_sol.j, [0; 0; 1; 2; 2; 2] )
+            testCase.assertEqual(interpolated_sol.x, [x1; x1; x2; x3; x3; x3])
+        end
+
+
+        function testInterpolateToHybridArc_ExtraInterpPointsAtJumpDiscarded(testCase)
+            T_JUMP = 4;
+            T_END = 8;
+            n_per_flow = 7;
+            x1 = [1 10]; x2 = [2 20]; x3 = [3 30];
+            t = [linspace(0, T_JUMP, n_per_flow)';
+                 T_JUMP';
+                 linspace(T_JUMP, T_END, n_per_flow)'];
+            j = [zeros(n_per_flow, 1); 1; 2* ones(n_per_flow, 1)];
+            x = [ones(n_per_flow, 1)*x1; x2; ones(n_per_flow, 1)*x3]; 
+            sol = HybridArc(t,j,x);
+
+            t_grid = [0 T_JUMP T_JUMP T_JUMP T_JUMP 6];
+            interpolated_sol = sol.interpolateToHybridArc(t_grid);
+
+            % Check values
+            testCase.assertEqual(interpolated_sol.t, [0; T_JUMP; T_JUMP; T_JUMP; 6] )
+            testCase.assertEqual(interpolated_sol.j, [0; 0; 1; 2; 2] )
+            testCase.assertEqual(interpolated_sol.x, [x1; x1; x2; x3; x3])
+        end
+
         function testInterpolateToHybridArc_JNotStartingAt0(testCase)
             T_JUMP = 4;
             T_END = 8;

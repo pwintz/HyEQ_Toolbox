@@ -398,6 +398,9 @@ classdef HybridArc
 
         function hybrid_arc = interpolateToHybridArc(this, t_interp, varargin)
             % Generate a new HybridArc object with time steps at the interpolation points given in t_interp.
+            % t_interp must be a nondecreaing vector of values that within the
+            % interval [this.t(1), this.t(end)].
+            % There is an optional
 
             % TODO: Add documentation
             % DONE: Add autocomplete signiture.
@@ -405,11 +408,6 @@ classdef HybridArc
             %   * Interpolation works when interpolation grid aligns with jump
             %   times (e.g., a interpolation time is at the start or end of an IOF).
             %   * Works even if there are two sequential jumps.
-            %   * Works even if IOF has only two samples (or less?)
-            %   * Works even if no interpolation points occur in IOF
-            %   * Works for 1D and 2D arcs.
-            %   * t-values outside of given range are not included.
-            %   * Test if t-values don't extend to entire domain.
             ip = inputParser;
             ip.FunctionName = 'HybridArc.interpolateToHybridArc';
             addOptional(ip, 'InterpMethod', 'spline');
@@ -434,11 +432,20 @@ classdef HybridArc
             for j_iof = unique(j_interp')
                 interp_iof_ndxs = find(j_interp == j_iof);
                 % is_this_iof = ;
-                t_iof = t_interp(interp_iof_ndxs);
+                t_interp_iof = t_interp(interp_iof_ndxs);
+                t_iof = this.t(this.j == j_iof);
+                x_iof = this.x(this.j == j_iof, :);
+                if numel(t_iof) == 1
+                    assert(numel(t_interp_iof) == 1)
+                    assert(t_interp_iof == t_iof)
+                    x_interp(interp_iof_ndxs, :) = x_iof;
+                    continue
+                end
+
                 x_interp(interp_iof_ndxs, :) = interp1( ...
-                    this.t(this.j == j_iof), ... Select the t values from this interval of flow
-                    this.x(this.j == j_iof, :), ... Select the x values from this interval of flow
-                    t_iof, ...% Give the interpolation grid in this interval of flow.
+                    t_iof, ... Select the t values from this interval of flow
+                    x_iof, ... Select the x values from this interval of flow
+                    t_interp_iof, ... Give the interpolation grid in this interval of flow.
                     interp_method); 
             end
 
