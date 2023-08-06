@@ -400,11 +400,10 @@ classdef HybridArc
             % Generate a new HybridArc object with time steps at the interpolation points given in t_interp.
 
             % TODO: Add documentation
-            % TODO: Add autocomplete signiture.
+            % DONE: Add autocomplete signiture.
             % Tests to write:
             %   * Interpolation works when interpolation grid aligns with jump
-            %   times (e.g., a interpolation time is at the start or end of an
-            %   IOF).
+            %   times (e.g., a interpolation time is at the start or end of an IOF).
             %   * Works even if there are two sequential jumps.
             %   * Works even if IOF has only two samples (or less?)
             %   * Works even if no interpolation points occur in IOF
@@ -530,19 +529,19 @@ classdef HybridArc
             % Add jump times and sort the resulting array.
             t_out = sort([t_in_without_jump_times; t_before_and_after_jump]);
         end
-
-        function j = tToJ(this, t)
-            % Map a given value of time to the  Work in progress. 
-            % t_excluding_after_jumps = this.t
-            [unique_t, unique_t_ndxs, ~] = unique(this.t);
-
-            % if t < this.t(1) or t > this.t(end
-            %   j = []
-            %   return
-            % end
-            
-            j = interp1(unique_t, this.j(unique_t_ndxs), t, 'previous');
-        end
+        
+        % function j = tToJ(this, t)
+        %     % Map a given value of time to the  Work in progress. 
+        %     % t_excluding_after_jumps = this.t
+        %     [unique_t, unique_t_ndxs, ~] = unique(this.t);
+        % 
+        %     % if t < this.t(1) or t > this.t(end
+        %     %   j = []
+        %     %   return
+        %     % end
+        % 
+        %     j = interp1(unique_t, this.j(unique_t_ndxs), t, 'previous');
+        % end
 
         function j_out = tToJIncrementingJForRepeatedTValuesAtJumps(this, t_in)
 
