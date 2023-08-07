@@ -90,19 +90,153 @@ ylabel('Energy')
 % In cases where an interpolation point in |t_grid| aligns with one of the jump
 % times, the resulting array can be configured
 
-t_grid = linspace(0.5, 5.5, 10);
-x_interp = sol.interpolateToArray(t_grid);
+grid = linspace(0.5, 5.5, 10);
+% Create interpolated array.
+x_interp = sol.interpolateToArray(grid);
+
+%%
+% We plot the array and the original hybrid arc.
 
 clf
+% Plot original Hybrid Arc
 hpb = HybridPlotBuilder().color('black')...
     .legend('Hybrid Arc')...
     .plotFlows(sol.restrictT([0, 6]).select(1));
 hold on
-interp_plt = plot(t_grid(:), x_interp(:, 1), 'red*-');
 
-grid_plt = plot(t_grid, 0*t_grid, 'r|');
+% Plot interpolated array.
+interp_plt = plot(grid(:), x_interp(:, 1), 'red*-');
 hpb.addLegendEntry(interp_plt, 'Interpolated Array');
-hpb.addLegendEntry(grid_plt, 'Interpolation grid');
+
+% Plot interpolation grid.
+grid_plt = plot(grid, 0*grid, 'r|');
+hpb.addLegendEntry(grid_plt, 'Interpolation Grid');
+
+%% 
+% Alternatively, you can also use interpolation to create a new hybrid arc. 
+% The resulting hybrid arc interpolates the value of $x$ at each given point in
+% time, but also includes the values at jumps (both before and after) so that
+% the hybrid time domain is preserved (at least within the range of the given
+% time grid---the range can be restricted).
+
+grid = linspace(0, 1, 40);
+t_grid_even_space = sol.t(end) * grid;
+t_grid_increasing_space = sol.t(end)*grid.^2;
+t_grid_decreasing_space = sol.t(end)*(1 - (1 - grid).^2);
+% Create interpolated array.
+sol_x1 = sol.select(1); % Select only first component.
+sol_x1_interp_even = sol_x1.interpolateToHybridArc(t_grid_even_space);
+sol_x1_interp_inc = sol_x1.interpolateToHybridArc(t_grid_increasing_space);
+sol_x1_interp_dec = sol_x1.interpolateToHybridArc(t_grid_decreasing_space);
+
+% Plot hybrid arcs.
+clf
+hpb = HybridPlotBuilder();
+
+% Plot original hybrid arcs.
+hpb.color('black').flowMarker('').jumpMarker('').legend('Original');
+subplot(3, 1, 1); hpb.plotFlows(sol_x1); hold on
+subplot(3, 1, 2); hpb.plotFlows(sol_x1); hold on
+subplot(3, 1, 3); hpb.plotFlows(sol_x1); hold on
+
+% Plot interpolated arcs.
+hpb.color('red').jumpMarker('*').flowMarker('.');
+subplot(3, 1, 1); hpb.legend('Interpolated (Even Space)').plotFlows(sol_x1_interp_even)
+subplot(3, 1, 2); hpb.legend('Interpolated (Increasing Space)').plotFlows(sol_x1_interp_inc)
+subplot(3, 1, 3); hpb.legend('Interpolated (Decreasing Space)').plotFlows(sol_x1_interp_dec)
+
+%%
+% For both interpolation functions, |interpolateToArray| and
+% |interpolateToHybridArc| you can
+% 
+% * Pass a single integer instead of a time grid. The function then generates an
+% evenly spaced time grid with the given number of points (in the case of
+% |interpolateToHybridArc|, though, the number of output time steps will be
+% generally be higher due to the time steps added at jumps!)
+% * The interpolation method can be modified by using the name-value arguments
+% |'InterpMethod'| followed by the desired interpolation method given as a
+% string, such as |'previous'|, |'linear'|, etc. 
+% See <matlab:doc('interp1') |interp1|> for a full list.
+% 
+
+%%
+% The |interpolateToArray| function also has an option to set how handle
+% interpolation points that occur exactly at a jump time. 
+% In such cases, there are two or more values of $x$ at a single value of $t$,
+% so standard interpolation is not well defined. 
+% The default behavior for |interpolateToArray| is to use the mean value of
+% before and after (possibly multiple) jumps.
+
+jump_time = 2;
+t = [0; jump_time; jump_time; 4];
+j = [0;         0;         1; 1];
+x = [3;         3;         5; 5];
+harc = HybridArc(t, j, x);
+
+% Grid for interpolation.
+t_grid = [0; 1.5; jump_time; 3; 4];
+
+x_interp = harc.interpolateToArray(t_grid);
+x_interp'
+
+
+%%
+
+% plot
+clf
+HybridPlotBuilder().color('black').plotFlows(harc)
+hold on
+plot(t_grid, x_interp, 'redo-')
+
+%%
+% 
+
+value_at_jump_fh = @(x_and_gx) NaN(size(x_and_gx, 1), 1);
+x_interp = harc.interpolateToArray(t_grid, 'ValueAtJumpFnc', value_at_jump_fh);
+x_interp'
+
+%%
+
+% plot
+clf
+HybridPlotBuilder().color('black').plotFlows(harc)
+hold on
+plot(t_grid, x_interp, 'redo-')
+
+%% 
+
+value_at_jump_fh = @(x_and_gx) x_and_gx;
+% Note that we need to use the 't_interp' output because x_interp may have added
+% rows.
+[x_interp, t_interp] = harc.interpolateToArray(t_grid, 'ValueAtJumpFnc', value_at_jump_fh);
+x_interp'
+
+%%
+
+% plot
+clf
+HybridPlotBuilder().color('black').plotFlows(harc)
+hold on
+plot(t_interp, x_interp, 'redo-')
+%% 
+
+value_at_jump_fh_start = @(x_and_gx) x_and_gx(:, 1); % Use the first value
+x_interp_start = harc.interpolateToArray(t_grid, 'ValueAtJumpFnc', value_at_jump_fh_start);
+x_interp_start'
+
+%%
+value_at_jump_fh_end = @(x_and_gx) x_and_gx(:, end); % Use the first value
+x_interp_end = harc.interpolateToArray(t_grid, 'ValueAtJumpFnc', value_at_jump_fh_end);
+x_interp_end'
+
+%%
+% plot
+clf
+HybridPlotBuilder().color('black').plotFlows(harc)
+hold on
+plot(t_grid, x_interp_start, 'redo-')
+plot(t_grid, x_interp_end, 'blueo-')
+
 
 %% Creating |HybridArc|s from arrays
 % You can also construct a |HybridArc| directly from the values of |t|, |j|, and
