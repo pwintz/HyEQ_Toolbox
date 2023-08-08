@@ -31,6 +31,8 @@ classdef HybridSolution < HybridArc
         % The reason the simulation terminated.
         % The value of termination_cause is set to one of the the enumeration
         % values in hybrid.TerminationCause.
+        % 
+        % See also hybrid.TerminationCause.
         termination_cause % hybrid.TerminationCause
     end
     
