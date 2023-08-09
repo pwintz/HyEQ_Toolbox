@@ -10,8 +10,8 @@ classdef HybridSolution < HybridArc
 %    hyrbid_arc = HybridArc(t, j, x);
 % 
 % See also: HybridArc, HybridSystem, hybrid.TerminationCause, 
-% <a href="matlab: hybrid.internal.openHelp('HybridSystem_demo')">Demo: How to Implement and Solve a Hybrid System</a>.
-% 
+% <a href="matlab: hybrid.internal.openHelp('HybridArc_demo')">Demo: Hybrid Arcs and Solutions</a>..
+%  
 % Added in HyEQ Toolbox version 3.0.
 
 % Written by Paul K. Wintz, Hybrid Systems Laboratory, UC Santa Cruz (©2022).

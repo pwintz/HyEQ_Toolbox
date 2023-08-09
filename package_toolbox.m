@@ -4,7 +4,7 @@ function package_toolbox()
 % Before running this script to generate a released toolbox package,
 % update the build number in HybridEquationsToolbox.prj.
 %
-% By Paul Wintz, 2021-2022.
+% By Paul Wintz, 2021-2023.
 
 % 'package_toolbox' is a function instead of script so that it has its own
 % variable workspace (functions don't use the base workspace, they have their
@@ -24,7 +24,7 @@ do_cleanup_path = do_package && true;
 
 % Make sure we are creating package using the latest version of MATLAB (update
 % the version string as new versions are released).
-assert(strcmp(version('-release'), '2022b'))
+assert(strcmp(version('-release'), '2023a'))
 
 projectFile = 'HybridEquationsToolbox.prj';
 toolbox_dirs = {'Examples', ...

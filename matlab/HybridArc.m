@@ -1,7 +1,8 @@
 classdef HybridArc
 % A numerical representation of a hybrid arc. 
 %
-% See also: HybridSolution, <a href="matlab: showdemo HybridSystem_demo">Demo: How to Implement and Solve a Hybrid System</a>.
+% See also: HybridSolution, <a href="matlab: hybrid.internal.openHelp('HybridArc_demo')">Demo: Hybrid Arcs and Solutions</a>.
+
 
 % Written by Paul K. Wintz, Hybrid Systems Laboratory, UC Santa Cruz. 
 % © 2021-2023. 

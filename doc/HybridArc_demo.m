@@ -1,4 +1,5 @@
-%% Hybrid Arcs and Solutions
+%% Demo: Hybrid Arcs and Solutions
+%% Introduction and Setup
 % In this tutorial, we show how to create and solve a hybrid system 
 % using the |HybridSystem| class. For a brief introduction to hybrid systems, 
 % see 
