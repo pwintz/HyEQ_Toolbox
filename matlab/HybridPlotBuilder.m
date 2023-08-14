@@ -859,6 +859,248 @@ classdef HybridPlotBuilder < handle
                 clearvars this
             end
         end
+
+        function this = setAxesArgs(this, varargin)
+            % Provide additional arguments that are passed to the axes function in each plot (or subplot). 
+            %
+            % Define axes arguments using name-value pairs. Multiple arguments
+            % can be set in a single call to setAxesArgs. Calling setAxesArgs a
+            % second time replaces the previously defined arguments.
+            % The arguments given here override any other settings defined by
+            % HybridPlotBuilder. To reset to the default value, call setAxesArgs([]).
+            % 
+            % The given arguments are applied to each axes in the plot after all
+            % other plotting is finished but before the callbacks passed in
+            % HybridPlotBuilder.configurePlots() are called.
+            % 
+            % Example: 
+            % 
+            %   HybridPlotBuilder().setAxesArgs('XGrid', 'on')
+            %
+            % See also: axes, setPlotArgs, setPlotFlowArgs,
+            % setPlotJumpArgs, setPlotJumpStartArgs, setPlotJumpLineArgs, setPlotJumpEndArgs
+            this.settings.user_axes_args = varargin;
+            this.last_function_call = 'setAxesArgs';
+
+            if nargout == 0
+                % Prevent output if function is not terminated with a
+                % semicolon.
+                clearvars this
+            end
+        end
+
+        % function this = addAxesArgs(this, varargin)
+        %     % TODO
+        %     %
+        %     % To reset to the default value, call axesArgs([]).
+        %     %
+        %     % See also: 
+        %     this.settings.axes_builtin_fnc_args = [this.settings.axes_builtin_fnc_args, varargin];
+        %     this.last_function_call = 'addAxesArgs';
+        % 
+        %     if nargout == 0
+        %         % Prevent output if function is not terminated with a
+        %         % semicolon.
+        %         clearvars this
+        %     end
+        % end
+
+        function this = setPlotArgs(this, varargin)
+            % Provide additional arguments that are passed to the plotting function. 
+            %
+            % Define plot arguments using name-value pairs. Multiple arguments
+            % can be set in a single call to setPlotArgs. Calling setPlotArgs a
+            % second time replaces the previously defined arguments.
+            % The arguments given here override any other settings defined
+            % defined using other |HybridPlotBuilder| functions, such as
+            % |flowColor| or |jumpMarker|.
+            % To reset to the default value, call setPlotArgs([]).  
+            %
+            % The priority of these commands
+            % is as follows, with the lowest priority on the left:
+            % 
+            %   default < other functions < setPlotArgs < setPlotFlowArgs
+            %                                           < setPlotJumpArgs < setPlotJumpStartArgs 
+            %                                                             < setPlotJumpEndArgs    
+            % 
+            % You can see a list of available name-value pairs in the Matlab documentation
+            % for plot.
+            %
+            % See also: plot, setAxesArgs, setPlotFlowArgs,
+            % setPlotJumpArgs, setPlotJumpStartArgs, setPlotJumpLineArgs, setPlotJumpEndArgs
+            this.settings.user_plot_args = varargin;
+            this.last_function_call = 'setPlotArgs';
+
+            if nargout == 0
+                % Prevent output if function is not terminated with a
+                % semicolon.
+                clearvars this
+            end
+        end
+
+        function this = setPlotFlowArgs(this, varargin)
+            % Provide additional arguments that are passed to the plotting function when plotting flows. 
+            %
+            % Define plot arguments using name-value pairs. Multiple arguments
+            % can be set in a single call to setPlotFlowArgs. Calling setPlotFlowArgs a
+            % second time replaces the previously defined arguments.
+            % The arguments given here override any other settings defined
+            % defined using other |HybridPlotBuilder| functions, such as
+            % |flowColor|.
+            % To reset to the default value, call setPlotFlowArgs([]).  
+            %
+            % The priority of these commands
+            % is as follows, with the lowest priority on the left:
+            % 
+            %   default < other functions < setPlotArgs < setPlotFlowArgs
+            %                                           < setPlotJumpArgs < setPlotJumpStartArgs 
+            %                                                             < setPlotJumpEndArgs    
+            % 
+            % You can see a list of available name-value pairs in the Matlab documentation
+            % for plot.
+            %
+            % See also: plot, setAxesArgs, setPlotArgs,
+            % setPlotJumpArgs, setPlotJumpStartArgs, setPlotJumpLineArgs, setPlotJumpEndArgs
+            this.settings.user_plot_flow_args = varargin;
+            this.last_function_call = 'setPlotFlowArgs';
+
+            if nargout == 0
+                % Prevent output if function is not terminated with a
+                % semicolon.
+                clearvars this
+            end
+        end
+
+        function this = setPlotJumpArgs(this, varargin)
+            % Provide additional arguments that are passed to the plotting function when plotting jumps (including the start and end markers and the line between). 
+            %
+            % Define plot arguments using name-value pairs. Multiple arguments
+            % can be set in a single call to setPlotArgs. Calling setPlotJumpArgs a
+            % second time replaces the previously defined arguments.
+            % The arguments given here override any other settings defined
+            % defined using other |HybridPlotBuilder| functions, such as |jumpMarker|.
+            % To reset to the default value, call setPlotJumpArgs([]).  
+            %
+            % The priority of these commands
+            % is as follows, with the lowest priority on the left:
+            % 
+            %   default < other functions < setPlotArgs < setPlotFlowArgs
+            %                                           < setPlotJumpArgs < setPlotJumpStartArgs 
+            %                                                             < setPlotJumpEndArgs    
+            % 
+            % You can see a list of available name-value pairs in the Matlab documentation
+            % for plot.
+            %
+            % See also: plot, setAxesArgs, setPlotArgs, setPlotFlowArgs,
+            % setPlotJumpStartArgs, setPlotJumpLineArgs, setPlotJumpEndArgs
+            this.settings.user_plot_jump_args = varargin;
+            this.last_function_call = 'setPlotJumpArgs';
+
+            if nargout == 0
+                % Prevent output if function is not terminated with a
+                % semicolon.
+                clearvars this
+            end
+        end
+
+        function this = setPlotJumpStartArgs(this, varargin)
+            % Provide additional arguments that are passed to the plotting function when plotting the start of jumps.
+            %
+            % Define plot arguments using name-value pairs. Multiple arguments
+            % can be set in a single call to setPlotJumpStartArgs. Calling setPlotJumpStartArgs a
+            % second time replaces the previously defined arguments.
+            % The arguments given here override any other settings defined
+            % defined using other |HybridPlotBuilder| functions, such as
+            % |flowColor| or |jumpMarker|.
+            % To reset to the default value, call setPlotJumpStartArgs([]).  
+            %
+            % The priority of these commands
+            % is as follows, with the lowest priority on the left:
+            % 
+            %   default < other functions < setPlotArgs < setPlotFlowArgs
+            %                                           < setPlotJumpArgs < setPlotJumpStartArgs 
+            %                                                             < setPlotJumpEndArgs    
+            % 
+            % You can see a list of available name-value pairs in the Matlab documentation
+            % for plot.
+            %
+            % See also: plot, setAxesArgs, setPlotArgs, setPlotFlowArgs,
+            % setPlotJumpArgs, setPlotJumpLineArgs, setPlotJumpEndArgs
+            this.settings.user_plot_jump_start_args = varargin;
+            this.last_function_call = 'setPlotStartArgs';
+
+            if nargout == 0
+                % Prevent output if function is not terminated with a
+                % semicolon.
+                clearvars this
+            end
+        end
+
+        function this = setPlotJumpLineArgs(this, varargin)
+            % Provide additional arguments that are passed to the plotting function when plotting the jump line.
+            %
+            % Define plot arguments using name-value pairs. Multiple arguments
+            % can be set in a single call to setPlotJumpLineArgs. Calling setPlotJumpLineArgs a
+            % second time replaces the previously defined arguments.
+            % The arguments given here override any other settings defined
+            % defined using other |HybridPlotBuilder| functions, such as
+            % |flowColor| or |jumpMarker|.
+            % To reset to the default value, call setPlotJumpLineArgs([]).  
+            %
+            % The priority of these commands
+            % is as follows, with the lowest priority on the left:
+            % 
+            %   default < other functions < setPlotArgs < setPlotFlowArgs
+            %                                           < setPlotJumpArgs < setPlotJumpStartArgs 
+            %                                                             < setPlotJumpEndArgs    
+            % 
+            % You can see a list of available name-value pairs in the Matlab documentation
+            % for plot.
+            %
+            % See also: plot, setAxesArgs, setPlotArgs, setPlotFlowArgs,
+            % setPlotJumpArgs, setPlotJumpStartArgs, setPlotJumpEndArgs
+            this.settings.user_plot_jump_line_args = varargin;
+            this.last_function_call = 'setPlotJumpLineArgs';
+
+            if nargout == 0
+                % Prevent output if function is not terminated with a
+                % semicolon.
+                clearvars this
+            end
+        end
+
+        function this = setPlotJumpEndArgs(this, varargin)
+            % Provide additional arguments that are passed to the plotting function when plotting the end of jumps.
+            %
+            % Define plot arguments using name-value pairs. Multiple arguments
+            % can be set in a single call to setPlotJumpEndArgs. Calling setPlotJumpEndArgs a
+            % second time replaces the previously defined arguments.
+            % The arguments given here override any other settings defined
+            % defined using other |HybridPlotBuilder| functions, such as
+            % |flowColor| or |jumpMarker|.
+            % To reset to the default value, call setPlotJumpEndArgs([]).  
+            %
+            % The priority of these commands
+            % is as follows, with the lowest priority on the left:
+            % 
+            %   default < other functions < setPlotArgs < setPlotFlowArgs
+            %                                           < setPlotJumpArgs < setPlotJumpStartArgs 
+            %                                                             < setPlotJumpEndArgs    
+            % 
+            % You can see a list of available name-value pairs in the Matlab documentation
+            % for plot.
+            %
+            % See also: plot, setAxesArgs, setPlotArgs, setPlotFlowArgs,
+            % setPlotJumpArgs, setPlotJumpStartArgs, setPlotJumpLineArgs
+            this.settings.user_plot_jump_end_args = varargin;
+            this.last_function_call = 'setPlotJumpEndArgs';
+
+            if nargout == 0
+                % Prevent output if function is not terminated with a
+                % semicolon.
+                clearvars this
+            end
+        end
         
         function this = configurePlots(this, plots_callback)
             % Provide a function handle that is called within each plot (or subplot).
@@ -1211,8 +1453,11 @@ classdef HybridPlotBuilder < handle
                 
                 if i_sp == 1 || this.settings.auto_subplots 
                     if ~is_hold_on_before
-                        % Clear the plot to emulate 'hold off' behavior.
-                        this.settings.plot_function_2D(axes_array(i_sp), nan, nan);
+                        % Clear the axes, thereby emulating the typical 'hold off' behavior. 
+                        % Including the 'reset' argument for cla() is important
+                        % because it causes all of the axes properties to be
+                        % deleted, giving us a clean slate.
+                        cla('reset');
                     end
                     hold on
 
@@ -1300,6 +1545,11 @@ classdef HybridPlotBuilder < handle
                 xlim(axes, plt_data.xlim)
                 ylim(axes, plt_data.ylim)
 
+                % Pass user-defined arguments to "axes". 
+                if ~isempty(this.settings.user_axes_args)
+                    set(axes, this.settings.user_axes_args{:});
+                end
+
                 this.settings.plots_callback(axes, plt_data.state_ndx);
             end
 
@@ -1317,7 +1567,9 @@ classdef HybridPlotBuilder < handle
             if isempty(x)
                return 
             end
-            this.settings.plot_function_2D(ax, x(:,1), x(:,2), flow_args{:})
+            this.settings.plot_function_2D(ax, ...
+                x(:,1), x(:,2), ...
+                flow_args{:})
         end
 
         function plotFlow3D(this, ax, x, flow_args)
@@ -1328,12 +1580,19 @@ classdef HybridPlotBuilder < handle
         end
 
         function plotJump2D(this, ax, x_jump, x_start, x_end, jump_args)
-            % Plot the line from start to end.
-            this.settings.plot_function_2D(ax, x_jump(:,1), x_jump(:,2), jump_args.line{:});
+            % (DO NOT REORDER JUMP COMPONENTS -- effects displayed layer order)
+            % Plot the line from start to end. 
+            this.settings.plot_function_2D(ax, ...
+                x_jump(:,1), x_jump(:,2), ...
+                jump_args.line{:});
             % Plot the start of the jump
-            this.settings.plot_function_2D(ax, x_start(:,1), x_start(:,2), jump_args.start{:});
+            this.settings.plot_function_2D(ax, ...
+                x_start(:,1), x_start(:,2), ...
+                jump_args.start{:});
             % Plot the end of the jump
-            this.settings.plot_function_2D(ax, x_end(:,1), x_end(:,2), jump_args.end{:});
+            this.settings.plot_function_2D(ax, ...
+                x_end(:,1), x_end(:,2), ...
+                jump_args.end{:});
         end
 
         function plotJump3D(this, ax, x_jump, x_before, x_after, jump_args)
