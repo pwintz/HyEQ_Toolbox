@@ -255,6 +255,24 @@ classdef HybridPlotBuilderTest < matlab.unittest.TestCase
            testCase.assertEqual(pb.settings.label_size, 17);
            pb.last_function_call = []; % To prevent a warning.
         end
+
+        function testNoWarnWithYYAxis(testCase)
+           hpb = HybridPlotBuilder();
+           % Set the tick label size, which should be used to set
+           % gca().XAxis.FontSize and gca().YAxis.FontSize
+           hpb.settings.tick_label_size = 30;
+           
+           % Plot using the left and right axes.
+           yyaxis left;
+           hpb.plotFlows(testCase.sol_1);
+           hold on
+           yyaxis right;
+           hpb.plotFlows(testCase.sol_1);
+
+           % Check that the label sizes are set
+           testCase.assertEqual(gca().XAxis.FontSize, 30)
+           testCase.assertEqual(gca().YAxis.FontSize, 30)
+        end
         
         function testTitleSize(testCase)
            pb = HybridPlotBuilder();

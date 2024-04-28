@@ -1509,17 +1509,22 @@ classdef HybridPlotBuilder < handle
                 if ~verLessThan('matlab', '9.0') % Only supported on R2016a and later.
                     try
                         for axis_name = {'XAxis', 'YAxis', 'ZAxis'}
-                            axes.(axis_name{1}).FontSize = this.settings.tick_label_size;
-                            axes.(axis_name{1}).TickLabelInterpreter = this.settings.tick_label_interpreter;
+                            % When "yyaxis left;" and "yyaxis right;" are used,
+                            % then "axes.(axis_name{1})" contains two
+                            % NumericRulers. Thus, we iterate through each one
+                            % to set the needed options.
+                            for ax = axes.(axis_name{1})'
+                                ax.FontSize = this.settings.tick_label_size;
+                                ax.TickLabelInterpreter = this.settings.tick_label_interpreter;
+                            end
                         end
-                    catch
+                    catch e
                         warning('HybridPlotBuilder:UnsupportedOperation:TickSettings', ...
-                            ['Setting the font size and interpreter for ticks is not supported ' ...
-                            'on this version of MATLAB. ' ...
+                            ['Setting the font size and interpreter for ticks failed with error message "%s".\n' ...
                             'If you see this warning, please ' ...
                             '<a href="https://github.com/pnanez/HyEQ_Toolbox/issues/new">' ... 
                             'submit an issue</a> on our GitHub repository and include your MATLAB version number. ' ...
-                            'To disable this warning, click <a href="matlab:warning(''off'', ''HybridPlotBuilder:UnsupportedOperation:TickSettings'')">here</a>.'])
+                            'To disable this warning, click <a href="matlab:warning(''off'', ''HybridPlotBuilder:UnsupportedOperation:TickSettings'')">here</a>.'],  e.message)
                     end
                 end
 
