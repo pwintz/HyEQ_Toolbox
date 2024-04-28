@@ -729,9 +729,9 @@ classdef HybridArc
             this.plotHybrid(varargin{:});
         end
 
-        function plot(this, varargin)
+        function plot(~, varargin)
             % Deprecated: Do not use.
-            HybridPlotBuilder.plot(this)
+            error('HybridArc/plot is deprecated. Use plotFlows, plotJumps, plotHybrid, or plotPhase instead.')
         end
     end
 

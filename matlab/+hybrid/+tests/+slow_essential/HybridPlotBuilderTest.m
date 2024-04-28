@@ -270,8 +270,9 @@ classdef HybridPlotBuilderTest < matlab.unittest.TestCase
            hpb.plotFlows(testCase.sol_1);
 
            % Check that the label sizes are set
-           testCase.assertEqual(gca().XAxis.FontSize, 30)
-           testCase.assertEqual(gca().YAxis.FontSize, 30)
+           ax = gca();
+           testCase.assertEqual(ax.XAxis.FontSize, 30)
+           testCase.assertEqual(ax.YAxis.FontSize, 30)
         end
         
         function testTitleSize(testCase)
@@ -585,8 +586,9 @@ classdef HybridPlotBuilderTest < matlab.unittest.TestCase
 
             % The default legend options are used despite the existing legend,
             % which had non-default settings.
-            testCase.assertEqual(gca().Legend.Location, 'northeast');
-            testCase.assertEqual(gca().Legend.NumColumns, 1);
+            ax = gca();
+            testCase.assertEqual(ax.Legend.Location, 'northeast');
+            testCase.assertEqual(ax.Legend.NumColumns, 1);
 
             % The legend entry added without the HPB is not included in the
             % final legend.
