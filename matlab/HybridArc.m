@@ -15,7 +15,7 @@ classdef HybridArc
 % See also: open('hybrid.tests.HybridSolutionTest')
     
     properties(SetAccess = immutable)
-        % A column vector containing the continuous time value for each entry in the solution.
+        % A column vector containing the continuous-time value for each entry in the solution.
         t % double (:, 1)
 
         % A column vector containing the discrete time value for each entry in the solution.
@@ -294,6 +294,8 @@ classdef HybridArc
             %           Does *not* preserve the given interpolation grid because
             %           additional entries are added at jump times.
             % 
+            % Added in HyEQ Toolbox version 3.1.
+            % 
             % See also: 
             % HybridArc/interpolateToHybridArc
 
@@ -451,6 +453,8 @@ classdef HybridArc
             % * 'spline' 
             % See <a href="matlab:doc('interp1')">interp1</a> for details.
             % 
+            % Added in HyEQ Toolbox version 3.1.
+            %
             % See also: 
             % HybridArc/interpolateToArray
 
